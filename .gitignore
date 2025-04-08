@@ -1,0 +1,56 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.py,cover
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+static/
+media/
+
+# Environment
+.env
+.env.prod
+.env.dev
+secrets.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Logs e dados
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testes e coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Builds e distribuição
+dist/
+build/
+*.egg-info/

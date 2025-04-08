@@ -1,0 +1,66 @@
+# Dockerfile
+# Estágio de construção
+FROM python:3.9-slim as builder
+
+WORKDIR /app
+
+# Instala dependências do sistema
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia e instala dependências Python
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# --------------------------------------------
+# Estágio final
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Copia as dependências instaladas do estágio anterior
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
+
+# Variáveis de ambiente obrigatórias (ajuste conforme seu ambiente)
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=core.settings
+
+# Variáveis do banco de dados (exemplo - substitua com seus valores)
+ENV POSTGRES_DB_NAME=dbname
+ENV POSTGRES_USER=dbuser
+ENV POSTGRES_PASS=dbpassword
+ENV POSTGRES_HOST=dbhost
+ENV POSTGRES_PORT=5432
+
+# Segurança
+ENV SECRET_KEY=sua-chave-secreta-aqui
+ENV DEBUG=False
+ENV ALLOWED_HOSTS=localhost,127.0.0.1,seu-dominio.com
+ENV CSRF_TRUSTED_ORIGINS=http://localhost,https://seu-dominio.com
+
+# Email (exemplo para SMTP)
+ENV EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+ENV EMAIL_HOST=smtp.example.com
+ENV EMAIL_PORT=587
+ENV EMAIL_HOST_USER=user@example.com
+ENV EMAIL_HOST_PASSWORD=email_password
+ENV EMAIL_USE_TLS=True
+
+# Twilio (opcional)
+ENV TWILIO_ACCOUNT_SID=your_account_sid
+ENV TWILIO_AUTH_TOKEN=your_auth_token
+ENV TWILIO_PHONE_NUMBER=+1234567890
+
+# Copia o projeto
+COPY . .
+
+# Comandos para executar a aplicação
+RUN python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "core.wsgi"]

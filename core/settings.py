@@ -1,17 +1,16 @@
 from pathlib import Path
 import os
-from decouple import AutoConfig
+from decouple import Config, RepositoryEmpty
 from datetime import timedelta
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 AUTH_USER_MODEL = "apps_users.CustomUser"
 
-config = AutoConfig(search_path=f'{BASE_DIR}/.env')
+config = Config(RepositoryEmpty)
 
-PROJECT_NAME = config('EcoMonitor', default='EcoMonitor')
+PROJECT_NAME = config('PROJECT_NAME', default='unknow')
 
 SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_2387')
 
@@ -19,6 +18,12 @@ DEBUG = config('DEBUG', default='True', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')],
                        default='localhost,0.0.0.0,127.0.0.1')
+
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')],
+                              default='http://0.0.0.0,http://localhost,http://127.0.0.1,https://0.0.0.0')
+
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', cast=bool,
+                              default=False)
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')],
                               default='http://0.0.0.0,http://localhost,http://127.0.0.1,https://0.0.0.0')
@@ -45,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'whitenoise.runserver_nostatic',
     'corsheaders',
-    'guardian',
 ] + CUSTOM_APPS
 
 ROOT_URLCONF = 'core.urls'
@@ -70,13 +74,15 @@ TEMPLATES = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',]
+ ]
 
 
 ROOT_URLCONF = 'core.urls'

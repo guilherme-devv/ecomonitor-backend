@@ -1,0 +1,39 @@
+# .dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+.env.prod
+.env.dev
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs e testes
+logs/
+*.log
+.coverage
+.pytest_cache/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Builds e estáticos (se gerados em tempo de execução)
+static/
+media/
