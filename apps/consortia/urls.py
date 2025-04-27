@@ -4,8 +4,8 @@ from .views import *
 
 
 router = routers.DefaultRouter()
-router.register(r'', MonitorModelViewSet, 'users')
+router.register(r'', ConsortiumModelViewSet, 'consortia')
 
 urlpatterns = [
-    path(r'users/monitors/', include((router.urls, 'users'))),
+    path(r'consortia/', include((router.urls, 'consortia'))),
 ]

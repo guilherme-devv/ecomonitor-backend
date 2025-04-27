@@ -1,24 +1,16 @@
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-
-from .models import CustomUser
-from .serializers import CreateCustomUserModelSerializer, CustomUserModelSerializer
+from rest_framework import viewsets
+from .models import Monitor
+from .serializers import MonitorModelSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
-class CustomUserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserModelSerializer
+class MonitorModelViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny, IsAuthenticated]
+    queryset = Monitor.objects.all()
+    serializer_class = MonitorModelSerializer
 
-    @swagger_auto_schema(
-        request_body=CreateCustomUserModelSerializer,
-        responses={
-            201: CreateCustomUserModelSerializer
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        serializer = CreateCustomUserModelSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        response_serializer = self.get_serializer(user)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny(),]
+        return super().get_permissions()

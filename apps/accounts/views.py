@@ -21,6 +21,7 @@ from drf_yasg import openapi
 from .serializers import *
 import secrets
 import hashlib
+from django.shortcuts import get_object_or_404
 
 from apps.users.models import UserResetPassword
 from apps.users.models import CustomUser
@@ -69,10 +70,6 @@ class ChangePasswordView(APIView):
         return Response(serializer.data)
 
 
-def generate_verification_code():
-    """Gera um código seguro de 6 dígitos."""
-    return str(secrets.randbelow(1000000)).zfill(6)
-
 class SendVerificationCodeView(APIView):
     """Endpoint para enviar um código de verificação via SMS."""
 
@@ -92,20 +89,10 @@ class SendVerificationCodeView(APIView):
     def post(self, request):
         serializer = PhoneNumberSerializer(data=request.data)
         if serializer.is_valid():
-            phone_number = serializer.validated_data['phone_number']
-            user = CustomUser.objects.filter(number_of_phone=phone_number).first()
+            phone_number = serializer.validated_data['phone_number']    
+            code = VerificationCode.generate_verification_code()
+            VerificationCode.objects.create(phone_number=phone_number, code=code)
 
-            if not user:
-                return Response({'error': 'Número de telefone não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-
-            # Gerar novo código e invalidar códigos antigos
-            VerificationCode.objects.filter(user=user).update(is_valid=False)
-            
-            code = generate_verification_code()
-            hashed_code = hashlib.sha256(code.encode()).hexdigest()
-            VerificationCode.objects.create(user=user, code=hashed_code, created_at=now())
-
-            # Enviar SMS via Twilio
             try:
                 response_sid = send_sms_twilio(phone_number, code)
                 return Response({'message': 'Código enviado com sucesso.', 'twilio_sid': response_sid}, status=status.HTTP_200_OK)
@@ -137,28 +124,21 @@ class ValidateVerificationCodeView(APIView):
             phone_number = serializer.validated_data['phone_number']
             code = serializer.validated_data['code']
 
-            user = CustomUser.objects.filter(number_of_phone=phone_number).first()
-            if not user:
-                return Response({'error': 'Usuário não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            verification_code = VerificationCode.objects.filter(
+                phone_number=phone_number,
+                is_valid=True
+            ).first()
 
-            # Buscar código mais recente válido
-            verification_code = VerificationCode.objects.filter(user=user, is_valid=True).order_by('-created_at').first()
-            if not verification_code:
-                return Response({'error': 'Código inválido ou expirado.'}, status=status.HTTP_400_BAD_REQUEST)
+            if verification_code is None:
+                return Response({'error': 'Nenhum código válido encontrado para este número.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Expiração do código
-            if verification_code.created_at < now() - timedelta(minutes=5):
-                verification_code.is_valid = False
-                verification_code.save()
-                return Response({'error': 'Código expirado.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Comparação segura do hash do código
-            if verification_code.code != hashlib.sha256(code.encode()).hexdigest():
+            if not verification_code.check_code(code):
                 return Response({'error': 'Código incorreto.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Invalidar código após o uso
-            verification_code.is_valid = False
-            verification_code.save()
+            if not verification_code.is_valid_code():
+                return Response({'error': 'Código expirado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            VerificationCode.invalidate_all_codes(phone_number)
 
             return Response({'message': 'Código validado com sucesso!'}, status=status.HTTP_200_OK)
 

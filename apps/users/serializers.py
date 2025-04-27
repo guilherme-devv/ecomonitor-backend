@@ -1,7 +1,9 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-
-from .models import CustomUser
+from .models import CustomUser, Monitor
+from .signals import monitor_created_signal
+from ..forms.models import Form1
+from ..forms.serializers import Form1ModelSerializer
 
 class BaseCustomUserSerializer(serializers.ModelSerializer):
 
@@ -21,24 +23,42 @@ class BaseCustomUserSerializer(serializers.ModelSerializer):
         return value
 
 
-class CreateCustomUserModelSerializer(BaseCustomUserSerializer):
+class MonitorModelSerializer(BaseCustomUserSerializer):
+    last_form = serializers.SerializerMethodField()
+    total_collected = serializers.SerializerMethodField()
+
     class Meta:
-        model = CustomUser
+        model = Monitor
         fields = [
-            'number_of_phone', 'email', 'first_name', 'last_name', 
-            'city', 'cpf', 'date_of_birth', 'password', 'type'
+            'id','number_of_phone', 'email', 'first_name', 'last_name', 
+            'city', 'cpf', 'date_of_birth', 'consortium', 'municipality',
+            'last_form', 'total_collected'
         ]
+        extra_kwargs = {
+            'username': {'required': False},
+            'password': {'write_only': True},
+            'consortium': {'required': False},
+        }
+    
+    def get_last_form(self, obj):
+        print(Form1.objects.filter(municipality=obj.municipality).order_by('-created_at'))
+        last_form = Form1.objects.filter(municipality=obj.municipality).order_by('-created_at').first()
+        if last_form:
+            return Form1ModelSerializer(last_form).data
+        return None
+    
+    def get_total_collected(self, obj):
+        total_collected = Form1.objects.filter(municipality=obj.municipality).count()
+        return total_collected
 
-    def save(self, **kwargs):
-        if self.validated_data.get('password', None):
-            self.validated_data['password'] = make_password(self.validated_data['password'])
-        return super().save(**kwargs)
-
-
-class CustomUserModelSerializer(BaseCustomUserSerializer):
-    class Meta:
-        model = CustomUser
-        fields = [
-            'number_of_phone', 'email', 'first_name', 'last_name', 
-            'city', 'cpf', 'date_of_birth'
-        ]
+    def create(self, validated_data):
+        password = self.random_password()
+        validated_data['password'] = make_password(password)
+        validated_data['consortium'] = validated_data['municipality'].consortium
+        instance = super().create(validated_data)
+        monitor_created_signal.send(sender=Monitor, instance=instance, password=password)
+        return instance
+    
+    def random_password(self):
+        from uuid import uuid4
+        return uuid4().hex[:8]

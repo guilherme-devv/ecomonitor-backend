@@ -15,7 +15,7 @@ schema_view = get_schema_view(
         default_version='v1',
         description="Este documento descreve os recursos disponíveis nesta API",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="daviteixeira077@gmail.com"),
+        contact=openapi.Contact(email=""),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
@@ -36,6 +36,9 @@ urlpatterns = [
 
     path(r'api/', include('apps.accounts.urls')),
     path(r'api/', include('apps.users.urls')),
+    path(r'api/', include('apps.consortia.urls')),
+    path(r'api/', include('apps.municipalities.urls')),
+    path(r'api/', include('apps.forms.urls')),
 
     re_path(r'^(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

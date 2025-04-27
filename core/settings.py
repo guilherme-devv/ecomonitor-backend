@@ -1,14 +1,12 @@
 from pathlib import Path
 import os
-from decouple import Config, RepositoryEmpty
+from decouple import config
 from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 AUTH_USER_MODEL = "apps_users.CustomUser"
-
-config = Config(RepositoryEmpty)
 
 PROJECT_NAME = config('PROJECT_NAME', default='unknow')
 
@@ -30,6 +28,9 @@ CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=lambda v: [s.strip() 
 CUSTOM_APPS = [
     'apps.accounts',
     'apps.users',
+    'apps.municipalities',
+    'apps.consortia',
+    'apps.forms'
 ]
 
 

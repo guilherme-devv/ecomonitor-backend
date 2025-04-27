@@ -4,8 +4,8 @@ from .views import *
 
 
 router = routers.DefaultRouter()
-router.register(r'', MonitorModelViewSet, 'users')
+router.register(r'', MunicipalityModelViewSet, 'municipalities')
 
 urlpatterns = [
-    path(r'users/monitors/', include((router.urls, 'users'))),
+    path(r'municipalities/', include((router.urls, 'municipalities'))),
 ]
