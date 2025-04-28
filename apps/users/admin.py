@@ -28,6 +28,9 @@ class MonitorAdmin(CustomUserAdmin):
     fieldsets = CustomUserAdmin.fieldsets + (
         ('Monitor Info', {'fields': ('municipality', 'consortium')}),
     )
+    add_fieldsets = CustomUserAdmin.add_fieldsets + (
+        ('Monitor Info', {'fields': ('municipality', 'consortium')}),
+    )
     list_display = CustomUserAdmin.list_display + ('municipality', 'consortium')
 
 
@@ -36,18 +39,14 @@ class ManagerAdmin(CustomUserAdmin):
     fieldsets = CustomUserAdmin.fieldsets + (
         ('Manager Info', {'fields': ('consortia',)}),
     )
+    add_fieldsets = CustomUserAdmin.add_fieldsets + (
+        ('Manager Info', {'fields': ('consortia',)}),
+    )
     list_display = CustomUserAdmin.list_display + ('get_consortia',)
 
     def get_consortia(self, obj):
         return ", ".join([consortium.name for consortium in obj.consortia.all()])
     get_consortia.short_description = "Consortia"
-
-
-# @admin.register(UserResetPassword)
-# class UserResetPasswordAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'reset_code', 'reset_code_expiration', 'is_code_valid')
-#     readonly_fields = ('reset_code', 'reset_code_expiration', 'is_code_valid')
-#     search_fields = ('user__username', 'user__email', 'reset_code')
 
 
 @admin.register(TemporaryPassword)
