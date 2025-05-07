@@ -2,8 +2,8 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from .models import CustomUser, Monitor
 from .signals import monitor_created_signal
-from ..forms.models import Form1
-from ..forms.serializers import Form1ModelSerializer
+from ..forms.models import RecyclableWasteComposition
+from ..forms.serializers import RecyclableWasteCompositionModelSerializer
 
 class BaseCustomUserSerializer(serializers.ModelSerializer):
 
@@ -41,14 +41,13 @@ class MonitorModelSerializer(BaseCustomUserSerializer):
         }
     
     def get_last_form(self, obj):
-        print(Form1.objects.filter(municipality=obj.municipality).order_by('-created_at'))
-        last_form = Form1.objects.filter(municipality=obj.municipality).order_by('-created_at').first()
+        last_form = RecyclableWasteComposition.objects.filter(user=obj).order_by('-created_at').first()
         if last_form:
-            return Form1ModelSerializer(last_form).data
+            return RecyclableWasteCompositionModelSerializer(last_form).data
         return None
     
     def get_total_collected(self, obj):
-        total_collected = Form1.objects.filter(municipality=obj.municipality).count()
+        total_collected = sum(RecyclableWasteComposition.objects.filter(user=obj).values_list('total', flat=True))
         return total_collected
 
     def create(self, validated_data):

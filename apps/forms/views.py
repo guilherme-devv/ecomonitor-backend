@@ -1,13 +1,13 @@
 from rest_framework import viewsets
-from apps.forms.models import Form1
-from apps.forms.serializers import Form1ModelSerializer
+from apps.forms.models import RecyclableWasteComposition
+from apps.forms.serializers import RecyclableWasteCompositionModelSerializer
 from rest_framework.response import Response
 from apps.users.permissions import IsMonitor
 from rest_framework.permissions import IsAuthenticated 
 
-class Form1ViewSet(viewsets.ModelViewSet):
-    queryset = Form1.objects.all()
-    serializer_class = Form1ModelSerializer
+class RecyclableWasteCompositionViewSet(viewsets.ModelViewSet):
+    queryset = RecyclableWasteComposition.objects.all()
+    serializer_class = RecyclableWasteCompositionModelSerializer
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):

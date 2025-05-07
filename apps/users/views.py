@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 class MonitorModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny, IsAuthenticated]
+    permission_classes = [IsAuthenticated,]
     queryset = Monitor.objects.all()
     serializer_class = MonitorModelSerializer
 

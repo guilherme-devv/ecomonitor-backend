@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Form1
+from .models import RecyclableWasteComposition
 
 
-@admin.register(Form1)
+@admin.register(RecyclableWasteComposition)
 class Form1Admin(admin.ModelAdmin):
     pass

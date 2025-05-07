@@ -3,7 +3,7 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'form1', views.Form1ViewSet, basename='recyclable-compositions')
+router.register(r'recyclable-waste-composition', views.RecyclableWasteCompositionViewSet, basename='recyclable-compositions')
 
 
 urlpatterns = [
