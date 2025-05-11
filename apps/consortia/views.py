@@ -28,7 +28,7 @@ class ConsortiumModelViewSet(ModelViewSet):
         serializer = MonitorModelSerializer(monitors, many=True)
         return Response(serializer.data)
     
-    def get_date_interval(request):
+    def get_date_interval(self, request):
             period = request.query_params.get('period', 'day')
 
             if period == 'custom':
@@ -78,13 +78,13 @@ class ConsortiumModelViewSet(ModelViewSet):
             consortium=consortium
         ).aggregate(total=Sum('total'))['total'] or 0
 
-        previous_day = date.today - timedelta(days=1)
+        previous_day = date.today() - timedelta(days=1)
         previous_day_waste = RecyclableWasteComposition.objects.filter(
             created_at__date=previous_day,
             consortium=consortium
         ).aggregate(total=Sum('total'))['total'] or 0
 
-        previous_week_start = date.today() - timedelta(days=today.weekday() + 7)
+        previous_week_start = date.today() - timedelta(days=date.today().weekday() + 7)
         previous_week_end = previous_week_start + timedelta(days=6)
         previous_week_waste = RecyclableWasteComposition.objects.filter(
             created_at__date__gte=previous_week_start,
