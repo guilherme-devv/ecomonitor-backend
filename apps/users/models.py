@@ -53,7 +53,9 @@ class Monitor(CustomUser):
         Consortium,
         on_delete=models.CASCADE,
         related_name="monitors",
-        verbose_name="Consórcio"
+        verbose_name="Consórcio",
+        null=True,
+        blank=True
     )
 
     class Meta:

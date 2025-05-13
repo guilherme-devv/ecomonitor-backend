@@ -38,6 +38,7 @@ class MonitorModelSerializer(BaseCustomUserSerializer):
             'username': {'required': False},
             'password': {'write_only': True},
             'consortium': {'required': False},
+            'municipality': {'required': False}
         }
     
     def get_last_form(self, obj):
@@ -53,7 +54,7 @@ class MonitorModelSerializer(BaseCustomUserSerializer):
     def create(self, validated_data):
         password = self.random_password()
         validated_data['password'] = make_password(password)
-        validated_data['consortium'] = validated_data['municipality'].consortium
+        # validated_data['consortium'] = validated_data['municipality'].consortium
         instance = super().create(validated_data)
         monitor_created_signal.send(sender=Monitor, instance=instance, password=password)
         return instance
