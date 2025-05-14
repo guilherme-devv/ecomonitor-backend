@@ -93,13 +93,16 @@ class SendVerificationCodeView(APIView):
             code = VerificationCode.generate_verification_code()
             VerificationCode.objects.create(phone_number=phone_number, code=code)
 
-            try:
-                response_sid = send_sms_twilio(phone_number, code)
-                return Response({'message': 'Código enviado com sucesso.', 'twilio_sid': response_sid}, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'error': f'Falha ao enviar SMS: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # try:
+            #     response_sid = send_sms_twilio(phone_number, code)
+            #     return Response({'message': 'Código enviado com sucesso.', 'twilio_sid': response_sid}, status=status.HTTP_200_OK)
+            # except Exception as e:
+            #     return Response({'error': f'Falha ao enviar SMS: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'code': code,
+        }, status=status.HTTP_200_OK)
 
 
 class ValidateVerificationCodeView(APIView):

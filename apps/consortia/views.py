@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from ..users.models import Monitor
-from ..users.serializers import MonitorModelSerializer
 from django.db.models import Sum
 from datetime import timedelta, date
 from ..forms.models import RecyclableWasteComposition
