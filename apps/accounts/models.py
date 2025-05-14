@@ -39,4 +39,4 @@ class VerificationCode(models.Model):
 
     @staticmethod
     def generate_verification_code():
-        return str(secrets.randbelow(1000000)).zfill(6)
+        return str(secrets.randbelow(1000000)).zfill(6)[:4]
