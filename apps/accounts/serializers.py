@@ -58,8 +58,6 @@ class PhoneNumberSerializer(serializers.Serializer):
     def validate_phone_number(self, value):
         if not value.startswith("+"):
             raise serializers.ValidationError("O número deve estar no formato internacional (+55 para Brasil).")
-        if not value[1:].isdigit():
-            raise serializers.ValidationError("O número de telefone deve conter apenas dígitos.")
         return value
 
 

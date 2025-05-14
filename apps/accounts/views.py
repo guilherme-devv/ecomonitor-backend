@@ -126,7 +126,8 @@ class ValidateVerificationCodeView(APIView):
 
             verification_code = VerificationCode.objects.filter(
                 phone_number=phone_number,
-                is_valid=True
+                is_valid=True,
+                code=code
             ).first()
 
             if verification_code is None:
