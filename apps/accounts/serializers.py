@@ -3,7 +3,7 @@ from django.contrib.auth.models import make_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer, RefreshToken)
-from apps.users.models import CustomUser
+from apps.users.models import CustomUser, Manager, Monitor
 
 
 class RecoveryPasswordResponseSerializer(serializers.Serializer):
@@ -25,7 +25,24 @@ class TokenObtainPairSerializerCustom(TokenObtainPairSerializer):
 
 class TokenUserSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    consortium = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
+    def get_consortium(self, obj):
+        if obj.type == Manager:
+            consortium = Manager.objects.get(id=obj.id).consortia
+            return consortium.id if consortium else None
+        elif obj.type == Monitor:
+            consortium = Monitor.objects.get(id=obj.id).consortium
+            return consortium.id if consortium else None
+        return None
+
+    def get_type(self, obj):
+        if obj.type == Manager:
+            return 'manager'
+        elif obj.type == Monitor:
+            return 'monitor'
+        return 'user'
 
 class TokenResponseSerializer(serializers.Serializer):
     refresh = serializers.CharField()

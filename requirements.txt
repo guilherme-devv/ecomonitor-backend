@@ -27,3 +27,4 @@ whitenoise==6.8.2
 python-decouple==3.8
 django-guardian==2.4.0
 twilio
+gunicorn

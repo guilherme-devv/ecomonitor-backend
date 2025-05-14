@@ -64,7 +64,7 @@ class Monitor(CustomUser):
 
 
 class Manager(CustomUser):
-    consortia = models.ManyToManyField(Consortium, related_name="managers", verbose_name="Consórcios")
+    consortia = models.ForeignKey(Consortium, related_name="managers", verbose_name="Consórcios", on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = "Manager"
